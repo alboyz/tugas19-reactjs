@@ -1,0 +1,12 @@
+.button {
+  width: 150px;
+  height: 50px;
+  background-color: #ff3232;
+  padding: 12px;
+  border-radius: 5px;
+  font-weight: bold;
+  color: white;
+}
+ul{
+  list-style: none;
+}
