@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import axios from "axios";
-import DatePicker from "react-datepicker";
-
 import "../Style/main.css";
 
 class Reactapi extends Component {
@@ -9,38 +7,55 @@ class Reactapi extends Component {
     super(props);
     this.state = {
       dataAPI: [],
+      edit: false,
       dataPost: {
         id: 0,
         nama_karyawan: "",
         jabatan: "",
-        jk: "",
-        startDate: null
+        jenis_kelamin: "laki-laki",
+        tanggal_lahir: new Date()
       }
     };
 
     this.handleRemove = this.handleRemove.bind(this);
     this.inputChange = this.inputChange.bind(this);
     this.onSubmitForm = this.onSubmitForm.bind(this);
+    this.getDataID = this.getDataID.bind(this);
+    this.clearData = this.clearData.bind(this);
   }
-  inputChange(e, date) {
+  inputChange(e) {
     let newDataPost = { ...this.state.dataPost };
-    newDataPost["id"] = new Date().getTime();
+    if (this.state.edit === false) {
+      newDataPost["id"] = new Date().getTime();
+    }
     newDataPost[e.target.name] = e.target.value;
 
     this.setState(
       {
-        dataPost: newDataPost,
-        startDate: date
+        dataPost: newDataPost
       },
       () => console.log(this.state.dataPost)
     );
   }
   onSubmitForm() {
-    axios
-      .post(`http://localhost:3004/data-karyawan`, this.state.dataPost)
-      .then(() => {
-        this.reloadData();
-      });
+    if (this.state.edit === false) {
+      axios
+        .post(`http://localhost:3004/data-karyawan`, this.state.dataPost)
+        .then(() => {
+          this.reloadData();
+          this.clearData();
+        });
+    } else {
+      axios
+        .put(
+          `http://localhost:3004/data-karyawan/${this.state.dataPost.id}`,
+          this.state.dataPost
+        )
+        .then(() => {
+          this.reloadData();
+          this.clearData();
+        });
+    }
   }
   handleRemove(e) {
     console.log(e.target.value);
@@ -48,11 +63,34 @@ class Reactapi extends Component {
       method: "DELETE"
     }).then(res => this.reloadData());
   }
+  getDataID(e) {
+    axios
+      .get(`http://localhost:3004/data-karyawan/${e.target.value}`)
+      .then(res => {
+        this.setState({
+          dataPost: res.data,
+          edit: true
+        });
+      });
+  }
+  clearData() {
+    let newDataPost = { ...this.state.dataPost };
+    newDataPost["id"] = "";
+    newDataPost["nama_karyawan"] = "";
+    newDataPost["jabatan"] = "";
+    newDataPost["jenis_kelamin"] = "laki-laki, Perempuan";
+    newDataPost["tanggal"] = "";
+
+    this.setState({
+      dataPost: newDataPost
+    });
+  }
 
   reloadData() {
     axios.get("http://localhost:3004/data-karyawan").then(res => {
       this.setState({
-        dataAPI: res.data
+        dataAPI: res.data,
+        edit: false
       });
     });
   }
@@ -71,6 +109,7 @@ class Reactapi extends Component {
             type="text"
             name="nama_karyawan"
             placeholder="Masukan Nama"
+            value={this.state.dataPost.nama_karyawan}
             onChange={this.inputChange}
           />
           <input
@@ -79,24 +118,26 @@ class Reactapi extends Component {
             type="text"
             name="jabatan"
             placeholder="Masukan Jabatan"
+            value={this.state.dataPost.jabatan}
             onChange={this.inputChange}
           />
           <select
             className="appearance-none block bg-white mx-6 text-grey-darker border border-red rounded py-3 px-4 mb-3"
             name="jenis_kelamin"
             placeholder="Gender"
-            value={this.state.jk}
+            value={this.state.dataPost.jenis_kelamin}
             onChange={this.inputChange}
           >
             <option value="Laki-Laki">Laki-laki</option>
             <option value="perempuan">Perempuan</option>
           </select>
-
-          <DatePicker
-            selected={this.state.startDate}
+          <input
+            className="appearance-none block bg-grey-lighter mx-6 text-grey-darker border border-red rounded py-3 px-4 mb-3"
+            type="date"
+            name="tanggal_lahir"
+            value={this.state.dataPost.tanggal_lahir}
             onChange={this.inputChange}
           />
-
           <button
             className="py-1 bg-blue-300 hover:bg-blue-400 text-white font-bold py-2 px-2 border-b-4 border-red-700 hover:border-red-500 rounded"
             type="submit"
@@ -135,6 +176,15 @@ class Reactapi extends Component {
                       onClick={this.handleRemove}
                     >
                       Delete
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      className="py-3 bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded"
+                      value={dat.id}
+                      onClick={this.getDataID}
+                    >
+                      Edit
                     </button>
                   </td>
                 </tr>

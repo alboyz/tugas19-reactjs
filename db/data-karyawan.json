@@ -5,7 +5,7 @@
       "nama_karyawan": "allen saputra",
       "jabatan": "Security",
       "jenis_kelamin": "laki-laki",
-      "tanggal_lahir": "1993-12-08"
+      "tanggal_lahir": "1992-12-08"
     },
     {
       "id": 1537298993816,
@@ -20,6 +20,13 @@
       "jabatan": "Security",
       "jenis_kelamin": "laki-laki",
       "tanggal_lahir": "1991-12-12"
+    },
+    {
+      "id": 1583585132643,
+      "nama_karyawan": "Aminah",
+      "jabatan": "Sekertaris",
+      "jenis_kelamin": "perempuan",
+      "tanggal_lahir": "2005-05-13"
     }
   ]
 }
